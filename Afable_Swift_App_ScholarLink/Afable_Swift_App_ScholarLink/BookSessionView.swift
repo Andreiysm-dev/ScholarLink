@@ -165,6 +165,34 @@ struct BookSessionView: View {
                     Text(bookingMessage)
                         .foregroundColor(bookingMessage.contains("Success") ? .green : .red)
                         .font(.caption)
+                    
+                    // Debug info
+                    if let user = currentUser {
+                        VStack(spacing: 4) {
+                            Text("Debug - Current User:")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                            Text("Name: \(user.firstName) \(user.lastName)")
+                                .font(.caption2)
+                                .foregroundColor(.blue)
+                            Text("Role: \(user.userRoleRaw)")
+                                .font(.caption2)
+                                .foregroundColor(.blue)
+                            Text("User ID: \(user.id.hashValue.description)")
+                                .font(.caption2)
+                                .foregroundColor(.blue)
+                        }
+                        .padding(8)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(8)
+                    } else {
+                        Text("Debug: No current user found!")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(8)
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(8)
+                    }
                 }
                 .padding()
             }
@@ -205,6 +233,14 @@ struct BookSessionView: View {
             return
         }
         
+        // Debug info
+        print("🔍 DEBUG - Booking Session:")
+        print("Student: \(student.firstName) \(student.lastName)")
+        print("Student ID: \(student.id.hashValue.description)")
+        print("Tutor: \(tutor.firstName) \(tutor.lastName)")
+        print("Tutor ID: \(tutor.id.hashValue.description)")
+        print("Subject: \(selectedSubject)")
+        
         // Create session request
         let sessionRequest = SessionRequest(
             studentId: student.id.hashValue.description,
@@ -216,15 +252,20 @@ struct BookSessionView: View {
             hourlyRate: tutor.hourlyRate ?? 0
         )
         
+        print("🔍 Session Request Created:")
+        print("Student ID in request: \(sessionRequest.studentId)")
+        print("Tutor ID in request: \(sessionRequest.tutorId)")
+        
         modelContext.insert(sessionRequest)
         
         do {
             try modelContext.save()
-            bookingMessage = "Success! Session request sent."
+            bookingMessage = "Success! Session request sent. Check console for debug info."
+            print("✅ Session saved successfully!")
             showingConfirmation = true
         } catch {
-            bookingMessage = "Failed to send request. Please try again."
-            print("Booking error: \(error)")
+            bookingMessage = "Failed to send request: \(error.localizedDescription)"
+            print("❌ Booking error: \(error)")
         }
     }
 }

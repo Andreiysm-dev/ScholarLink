@@ -562,17 +562,29 @@ struct TutorDetailView: View {
                 
                 Spacer()
                 
-                // Contact button
-                Button(action: {
-                    // Add contact functionality
-                }) {
-                    Text("Contact Tutor")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(10)
+                // Action buttons
+                VStack(spacing: 12) {
+                    NavigationLink(destination: BookSessionView(tutor: tutor)) {
+                        Text("Book Session")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
+                    
+                    Button(action: {
+                        // Add contact functionality
+                    }) {
+                        Text("Contact Tutor")
+                            .font(.subheadline)
+                            .foregroundColor(.blue)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(10)
+                    }
                 }
                 .padding()
             }

@@ -12,11 +12,22 @@ struct DashboardView: View {
     // Query all users to find current user (for now, we'll use the first user as current user)
     @Query private var allUsers: [User]
     
+    // Query session requests to show accepted sessions
+    @Query private var allSessionRequests: [SessionRequest]
+    
     // No more hardcoded data - we'll use real tutors from SwiftData
     
     // Get current user (simplified - in a real app you'd have proper user session management)
     var currentUser: User? {
         return allUsers.first // For demo purposes, using first user
+    }
+    
+    // Get accepted sessions for current user
+    var acceptedSessions: [SessionRequest] {
+        guard let user = currentUser else { return [] }
+        return allSessionRequests.filter { 
+            $0.studentId == user.id && $0.status == "accepted" 
+        }
     }
     
     var body: some View {
@@ -102,18 +113,29 @@ struct DashboardView: View {
     var recentActivitySection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Recent Activity")
+                Text("Your Sessions")
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
-                Text("This Week")
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                if !acceptedSessions.isEmpty {
+                    Text("\(acceptedSessions.count) Booked")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(8)
+                }
             }
             .padding(.horizontal, 4)
             
-            SimpleActivityRow(activity: "Mathematics session with Sarah", detail: "2 hours")
-            SimpleActivityRow(activity: "Programming session with Mike", detail: "1.5 hours")
+            if acceptedSessions.isEmpty {
+                EmptySessionCard()
+            } else {
+                ForEach(acceptedSessions.prefix(3), id: \.id) { session in
+                    SessionActivityRow(session: session)
+                }
+            }
         }
     }
 }
@@ -178,6 +200,82 @@ struct SimpleActivityRow: View {
 }
 
 // Note: Using TutorDetailView from Home.swift for tutor profiles
+
+// MARK: - Session Components
+
+struct SessionActivityRow: View {
+    let session: SessionRequest
+    @Query private var allUsers: [User]
+    
+    var tutor: User? {
+        allUsers.first { $0.id == session.tutorId }
+    }
+    
+    var body: some View {
+        HStack {
+            // Tutor Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(session.subject) with \(tutor?.firstName ?? "Tutor")")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                
+                Text(session.requestedDate.sessionDateFormat)
+                    .font(.caption)
+                    .foregroundColor(.blue)
+            }
+            
+            Spacer()
+            
+            // Session details
+            VStack(alignment: .trailing, spacing: 4) {
+                Text("\(session.duration) min")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.green)
+                
+                Text("Confirmed")
+                    .font(.caption2)
+                    .foregroundColor(.green)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(4)
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
+struct EmptySessionCard: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "calendar.badge.plus")
+                .font(.system(size: 40))
+                .foregroundColor(.gray.opacity(0.6))
+            
+            Text("No Sessions Yet")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.gray)
+            
+            Text("Book a session with a tutor to get started!")
+                .font(.caption)
+                .foregroundColor(.gray.opacity(0.8))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+        )
+    }
+}
 
 // Note: Removed duplicate components - using existing ones from Home.swift
 

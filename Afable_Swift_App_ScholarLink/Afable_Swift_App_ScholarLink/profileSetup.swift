@@ -230,7 +230,7 @@ struct RoleSelectionCard: View {
         Button(action: action) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(role.rawValue)
+                    Text(role == .learner ? "Student" : "Tutor")
                         .font(.headline)
                         .foregroundColor(.primary)
                     Text(role == .learner ? "Find tutors and learn new skills" : "Share your knowledge and help others")

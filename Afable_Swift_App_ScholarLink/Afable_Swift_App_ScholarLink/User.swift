@@ -2,8 +2,8 @@ import SwiftData
 import Foundation
 
 enum UserRole: String, CaseIterable, Codable {
-    case learner = "Learner"
-    case tutor = "Tutor"
+    case learner = "learner"
+    case tutor = "tutor"
 }
 
 @Model

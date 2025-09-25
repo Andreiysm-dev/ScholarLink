@@ -14,7 +14,7 @@ struct TutorDashboardView: View {
     // Get session requests for current tutor
     var tutorSessionRequests: [SessionRequest] {
         guard let tutor = currentTutor else { return [] }
-        return allSessionRequests.filter { $0.tutorId == tutor.id.uuidString }
+        return allSessionRequests.filter { $0.tutorId == tutor.id.persistentModelID.uuidString }
     }
     
     var pendingRequests: [SessionRequest] {
@@ -147,7 +147,7 @@ struct SessionRequestCard: View {
     @Query private var allUsers: [User]
     
     var student: User? {
-        allUsers.first { $0.id.uuidString == request.studentId }
+        allUsers.first { $0.id.persistentModelID.uuidString == request.studentId }
     }
     
     var body: some View {
@@ -246,7 +246,7 @@ struct AcceptedSessionCard: View {
     @Query private var allUsers: [User]
     
     var student: User? {
-        allUsers.first { $0.id.uuidString == session.studentId }
+        allUsers.first { $0.id.persistentModelID.uuidString == session.studentId }
     }
     
     var body: some View {

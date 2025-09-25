@@ -207,14 +207,19 @@ struct SimpleTutorCard: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            // Simple rating display (replacing circular progress)
+            // Profile picture placeholder (replacing circular progress)
             VStack(spacing: 8) {
-                Text("⭐")
-                    .font(.largeTitle)
+                Circle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(width: 60, height: 60)
+                    .overlay(
+                        Image(systemName: "person.fill")
+                            .font(.title2)
+                            .foregroundColor(.gray)
+                    )
                 
-                Text("\(String(format: "%.1f", tutor.rating))")
-                    .font(.headline)
-                    .fontWeight(.bold)
+                Text("\(String(format: "%.1f", tutor.rating)) ⭐")
+                    .font(.caption)
                     .foregroundColor(.blue)
             }
             

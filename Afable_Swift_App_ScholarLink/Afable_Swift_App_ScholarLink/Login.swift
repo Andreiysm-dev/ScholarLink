@@ -6,6 +6,7 @@ struct LoginView: View {
     @State private var password = ""
     @State private var loginMessage = ""
     @State private var isLoggedIn = false
+    @State private var isAdminLogin = false
     
     @Environment(\.modelContext) private var modelContext
     @Query private var users: [User]
@@ -88,6 +89,9 @@ struct LoginView: View {
             .navigationDestination(isPresented: $isLoggedIn) {
                 IndexView()
             }
+            .navigationDestination(isPresented: $isAdminLogin) {
+                AdminPanelView()
+            }
     }
     
     func loginUser() {
@@ -96,6 +100,13 @@ struct LoginView: View {
         
         guard !trimmedInput.isEmpty, !trimmedPassword.isEmpty else {
             loginMessage = "Please fill in all fields."
+            return
+        }
+        
+        // Check for admin login
+        if trimmedInput == "admin@email.com" && trimmedPassword == "admin" {
+            loginMessage = "Admin login successful!"
+            isAdminLogin = true
             return
         }
         

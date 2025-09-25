@@ -14,9 +14,9 @@ struct BookSessionView: View {
     @State private var showingConfirmation = false
     @State private var bookingMessage = ""
     
-    // Get current user (simplified - in real app you'd have proper session management)
+    // Get current logged-in user
     var currentUser: User? {
-        return allUsers.first { $0.userRoleRaw == "learner" }
+        return UserSession.shared.currentUser
     }
     
     var body: some View {

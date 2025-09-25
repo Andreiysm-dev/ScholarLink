@@ -47,12 +47,7 @@ struct HeaderView: View {
 
 //NAVIGATION OF PAGES
 struct IndexView: View {
-    @Query private var allUsers: [User]
-    
-    // Get current user (simplified - in real app you'd have proper session management)
-    var currentUser: User? {
-        return allUsers.first // For demo purposes, using first user
-    }
+    @StateObject private var userSession = UserSession.shared
     
     var body: some View {
         VStack {
@@ -64,8 +59,8 @@ struct IndexView: View {
                         Text("Home")
                     }
                 
-                // Show different dashboard based on user role
-                if currentUser?.userRoleRaw == "tutor" {
+                // Show different dashboard based on logged-in user role
+                if userSession.isCurrentUserTutor {
                     TutorDashboardView()
                         .tabItem {
                             Image(systemName: "calendar.badge.clock")

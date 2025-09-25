@@ -116,8 +116,9 @@ struct LoginView: View {
             && user.password == trimmedPassword
         }
         
-        if matchingUser != nil {
+        if let user = matchingUser {
             loginMessage = "Login successful!"
+            UserSession.shared.login(user: user)
             isLoggedIn = true
         } else {
             loginMessage = "Invalid credentials. Please try again."

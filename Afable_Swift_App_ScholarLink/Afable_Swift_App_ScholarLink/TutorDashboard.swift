@@ -6,9 +6,9 @@ struct TutorDashboardView: View {
     @Query private var allUsers: [User]
     @Query private var allSessionRequests: [SessionRequest]
     
-    // Get current tutor (simplified - in real app you'd have proper session management)
+    // Get current logged-in tutor
     var currentTutor: User? {
-        return allUsers.first { $0.userRoleRaw == "tutor" }
+        return UserSession.shared.currentUser
     }
     
     // Get session requests for current tutor

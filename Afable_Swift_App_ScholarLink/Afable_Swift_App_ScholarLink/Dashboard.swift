@@ -17,9 +17,9 @@ struct DashboardView: View {
     
     // No more hardcoded data - we'll use real tutors from SwiftData
     
-    // Get current user (simplified - in a real app you'd have proper user session management)
+    // Get current logged-in user
     var currentUser: User? {
-        return allUsers.first // For demo purposes, using first user
+        return UserSession.shared.currentUser
     }
     
     // Get accepted sessions for current user

@@ -61,23 +61,16 @@ struct TutorDashboardView: View {
                             .cornerRadius(8)
                         }
                         
-                        // Refresh Button
-                        Button(action: {
+                        // Simple Refresh Button
+                        Button("Refresh Sessions") {
                             refreshTrigger += 1
-                            // Force refresh the model context
-                            try? modelContext.save()
-                        }) {
-                            HStack {
-                                Image(systemName: "arrow.clockwise")
-                                Text("Refresh Sessions")
-                            }
-                            .font(.subheadline)
-                            .foregroundColor(.blue)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(8)
                         }
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(8)
                         
                         // Stats
                         HStack(spacing: 20) {
@@ -127,8 +120,8 @@ struct TutorDashboardView: View {
                                 .font(.caption)
                                 .foregroundColor(.red)
                             
-                            ForEach(allSessionRequests.prefix(3), id: \.dateCreated) { request in
-                                Text("Request - Tutor ID: \(request.tutorId), Student ID: \(request.studentId), Subject: \(request.subject)")
+                            ForEach(Array(allSessionRequests.prefix(3).enumerated()), id: \.offset) { index, request in
+                                Text("Request \(index + 1) - Subject: \(request.subject), Status: \(request.status)")
                                     .font(.caption2)
                                     .foregroundColor(.red)
                             }
@@ -160,11 +153,6 @@ struct TutorDashboardView: View {
                 }
             }
             .navigationBarHidden(true)
-            .onAppear {
-                // Refresh data when view appears
-                refreshTrigger += 1
-            }
-            .id(refreshTrigger) // Force view refresh when trigger changes
         }
     }
     

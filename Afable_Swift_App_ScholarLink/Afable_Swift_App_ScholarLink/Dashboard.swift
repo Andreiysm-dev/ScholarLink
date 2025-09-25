@@ -152,7 +152,10 @@ struct DashboardView: View {
     var tutorCardsSection: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
             ForEach(availableTutors.indices, id: \.self) { index in
-                SimpleTutorCard(tutor: availableTutors[index])
+                NavigationLink(destination: SimpleTutorProfileView(tutor: availableTutors[index])) {
+                    SimpleTutorCard(tutor: availableTutors[index])
+                }
+                .buttonStyle(PlainButtonStyle())
             }
         }
     }
@@ -279,6 +282,120 @@ struct SimpleActivityRow: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
+// MARK: - Simple Tutor Profile View
+struct SimpleTutorProfileView: View {
+    let tutor: SimpleTutor
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                // Profile Header
+                VStack(spacing: 16) {
+                    // Large profile picture placeholder
+                    Circle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(width: 120, height: 120)
+                        .overlay(
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 50))
+                                .foregroundColor(.gray)
+                        )
+                    
+                    VStack(spacing: 8) {
+                        Text(tutor.name)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text(tutor.subject)
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                        
+                        HStack(spacing: 16) {
+                            Text("\(String(format: "%.1f", tutor.rating)) ⭐")
+                                .font(.subheadline)
+                                .foregroundColor(.orange)
+                            
+                            Text("$\(tutor.price)/hour")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.green)
+                        }
+                    }
+                }
+                .padding()
+                
+                // About Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("About")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                    
+                    Text("Experienced \(tutor.subject.lowercased()) tutor with a passion for helping students achieve their goals. I focus on making complex concepts easy to understand.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                
+                // Experience Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Experience")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                    
+                    VStack(spacing: 8) {
+                        ExperienceRow(title: "Years Teaching", value: "5+ years")
+                        ExperienceRow(title: "Students Helped", value: "200+")
+                        ExperienceRow(title: "Success Rate", value: "95%")
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                
+                // Book Session Button
+                Button(action: {
+                    // TODO: Add booking functionality
+                }) {
+                    Text("Book a Session")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+        }
+        .navigationTitle("Tutor Profile")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Experience Row Component
+struct ExperienceRow: View {
+    let title: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+        }
+        .padding(.vertical, 4)
     }
 }
 

@@ -564,7 +564,7 @@ struct TutorDetailView: View {
                 
                 // Action buttons
                 VStack(spacing: 12) {
-                    NavigationLink(destination: BookSessionView(tutor: tutor)) {
+                    NavigationLink(destination: SimpleBookSessionView(tutor: tutor)) {
                         Text("Book Session")
                             .font(.headline)
                             .foregroundColor(.white)

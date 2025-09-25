@@ -61,7 +61,7 @@ struct IndexView: View {
                 
                 // Show different dashboard based on logged-in user role
                 if userSession.isCurrentUserTutor {
-                    TutorDashboardView()
+                    SimpleTutorDashboardView()
                         .tabItem {
                             Image(systemName: "calendar.badge.clock")
                             Text("Sessions")

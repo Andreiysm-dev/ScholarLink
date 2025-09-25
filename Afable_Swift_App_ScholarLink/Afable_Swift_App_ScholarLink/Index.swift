@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 // HEADER
 struct HeaderView: View {
@@ -46,6 +47,13 @@ struct HeaderView: View {
 
 //NAVIGATION OF PAGES
 struct IndexView: View {
+    @Query private var allUsers: [User]
+    
+    // Get current user (simplified - in real app you'd have proper session management)
+    var currentUser: User? {
+        return allUsers.first // For demo purposes, using first user
+    }
+    
     var body: some View {
         VStack {
             HeaderView()
@@ -55,11 +63,22 @@ struct IndexView: View {
                         Image(systemName: "house.fill")
                         Text("Home")
                     }
-                DashboardView()
-                    .tabItem {
-                        Image(systemName: "book")
-                        Text("Dashboard")
-                    }
+                
+                // Show different dashboard based on user role
+                if currentUser?.userRoleRaw == "tutor" {
+                    TutorDashboardView()
+                        .tabItem {
+                            Image(systemName: "calendar.badge.clock")
+                            Text("Sessions")
+                        }
+                } else {
+                    DashboardView()
+                        .tabItem {
+                            Image(systemName: "book")
+                            Text("Dashboard")
+                        }
+                }
+                
                 MessagesView()
                     .tabItem {
                         Image(systemName: "bubble.left")

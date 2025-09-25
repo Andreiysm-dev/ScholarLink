@@ -207,8 +207,8 @@ struct BookSessionView: View {
         
         // Create session request
         let sessionRequest = SessionRequest(
-            studentId: student.id.persistentModelID.uuidString,
-            tutorId: tutor.id.persistentModelID.uuidString,
+            studentId: student.id.hashValue.description,
+            tutorId: tutor.id.hashValue.description,
             subject: selectedSubject,
             requestedDate: selectedDate,
             duration: duration,

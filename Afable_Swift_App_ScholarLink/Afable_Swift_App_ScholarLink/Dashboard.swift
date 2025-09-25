@@ -26,7 +26,7 @@ struct DashboardView: View {
     var acceptedSessions: [SessionRequest] {
         guard let user = currentUser else { return [] }
         return allSessionRequests.filter { 
-            $0.studentId == user.id.persistentModelID.uuidString && $0.status == "accepted" 
+            $0.studentId == user.id.hashValue.description && $0.status == "accepted" 
         }
     }
     
@@ -208,7 +208,7 @@ struct SessionActivityRow: View {
     @Query private var allUsers: [User]
     
     var tutor: User? {
-        allUsers.first { $0.id.persistentModelID.uuidString == session.tutorId }
+        allUsers.first { $0.id.hashValue.description == session.tutorId }
     }
     
     var body: some View {

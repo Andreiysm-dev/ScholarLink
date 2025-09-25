@@ -9,7 +9,15 @@ struct DashboardView: View {
         user.userRoleRaw == "tutor" && user.isProfileComplete
     }) private var tutors: [User]
     
+    // Query all users to find current user (for now, we'll use the first user as current user)
+    @Query private var allUsers: [User]
+    
     // No more hardcoded data - we'll use real tutors from SwiftData
+    
+    // Get current user (simplified - in a real app you'd have proper user session management)
+    var currentUser: User? {
+        return allUsers.first // For demo purposes, using first user
+    }
     
     var body: some View {
         NavigationView {
@@ -104,7 +112,7 @@ struct DashboardView: View {
                 
                 // Welcome Message
                 VStack(spacing: 8) {
-                    Text("Hi Student")
+                    Text("Hi \(currentUser?.username ?? "Student")")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.white)

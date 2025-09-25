@@ -2,7 +2,7 @@ import SwiftUI
 import Foundation
 
 // Simple notification structure
-struct AppNotification: Identifiable {
+struct AppNotification: Identifiable, Codable {
     let id = UUID()
     let title: String
     let message: String
@@ -12,7 +12,7 @@ struct AppNotification: Identifiable {
     let timestamp: Date = Date()
     var isRead: Bool = false
     
-    enum NotificationType {
+    enum NotificationType: Codable {
         case sessionRequest    // New session request for tutor
         case sessionAccepted   // Session accepted for student
         case sessionRejected   // Session rejected for student
@@ -44,11 +44,44 @@ class NotificationManager: ObservableObject {
     
     static let shared = NotificationManager()
     
-    private init() {}
+    private let userDefaults = UserDefaults.standard
+    private let notificationsKey = "SavedNotifications"
+    
+    private init() {
+        loadNotifications()
+    }
+    
+    // Save notifications to UserDefaults
+    private func saveNotifications() {
+        do {
+            let data = try JSONEncoder().encode(notifications)
+            userDefaults.set(data, forKey: notificationsKey)
+            print("💾 Notifications saved to UserDefaults")
+        } catch {
+            print("❌ Failed to save notifications: \(error)")
+        }
+    }
+    
+    // Load notifications from UserDefaults
+    private func loadNotifications() {
+        guard let data = userDefaults.data(forKey: notificationsKey) else {
+            print("📱 No saved notifications found")
+            return
+        }
+        
+        do {
+            notifications = try JSONDecoder().decode([AppNotification].self, from: data)
+            print("📱 Loaded \(notifications.count) notifications from UserDefaults")
+        } catch {
+            print("❌ Failed to load notifications: \(error)")
+            notifications = []
+        }
+    }
     
     // Add a new notification
     func addNotification(_ notification: AppNotification) {
         notifications.insert(notification, at: 0) // Add to beginning for newest first
+        saveNotifications() // Save after adding
         print("📢 Notification added: \(notification.title) for \(notification.userEmail)")
     }
     
@@ -66,15 +99,21 @@ class NotificationManager: ObservableObject {
     func markAsRead(_ notification: AppNotification) {
         if let index = notifications.firstIndex(where: { $0.id == notification.id }) {
             notifications[index].isRead = true
+            saveNotifications() // Save after updating
         }
     }
     
     // Mark all notifications as read for a user
     func markAllAsReadForUser(email: String) {
+        var hasChanges = false
         for i in notifications.indices {
-            if notifications[i].userEmail == email {
+            if notifications[i].userEmail == email && !notifications[i].isRead {
                 notifications[i].isRead = true
+                hasChanges = true
             }
+        }
+        if hasChanges {
+            saveNotifications() // Save after updating
         }
     }
     

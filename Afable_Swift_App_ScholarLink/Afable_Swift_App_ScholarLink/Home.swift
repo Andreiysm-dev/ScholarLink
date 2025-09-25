@@ -497,6 +497,29 @@ struct SelfLearningView: View {
 
 struct TutorDetailView: View {
     let tutor: User
+    @StateObject private var sessionManager = SimpleSessionManager.shared
+    
+    var currentUser: User? {
+        return UserSession.shared.currentUser
+    }
+    
+    // Check if current student has pending sessions with this tutor
+    var hasPendingSession: Bool {
+        guard let user = currentUser else { return false }
+        let studentSessions = sessionManager.getSessionsForStudent(email: user.email)
+        return studentSessions.contains { session in
+            session.tutorEmail == tutor.email && session.isPending
+        }
+    }
+    
+    // Get pending session details
+    var pendingSession: SimpleSession? {
+        guard let user = currentUser else { return nil }
+        let studentSessions = sessionManager.getSessionsForStudent(email: user.email)
+        return studentSessions.first { session in
+            session.tutorEmail == tutor.email && session.isPending
+        }
+    }
     
     var body: some View {
         ScrollView {
@@ -564,14 +587,39 @@ struct TutorDetailView: View {
                 
                 // Action buttons
                 VStack(spacing: 12) {
-                    NavigationLink(destination: SimpleBookSessionView(tutor: tutor)) {
-                        Text("Book Session")
-                            .font(.headline)
-                            .foregroundColor(.white)
+                    if hasPendingSession {
+                        // Show pending status
+                        VStack(spacing: 8) {
+                            HStack {
+                                Image(systemName: "clock.fill")
+                                    .foregroundColor(.orange)
+                                Text("Session Request Pending")
+                                    .font(.headline)
+                                    .foregroundColor(.orange)
+                                    .fontWeight(.semibold)
+                            }
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.blue)
+                            .background(Color.orange.opacity(0.1))
                             .cornerRadius(10)
+                            
+                            if let session = pendingSession {
+                                Text("Waiting for \(tutor.firstName) to respond to your \(session.subject) session request")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .multilineTextAlignment(.center)
+                            }
+                        }
+                    } else {
+                        NavigationLink(destination: SimpleBookSessionView(tutor: tutor)) {
+                            Text("Book Session")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                        }
                     }
                     
                     Button(action: {

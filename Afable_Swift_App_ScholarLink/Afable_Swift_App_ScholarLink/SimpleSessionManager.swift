@@ -37,6 +37,14 @@ class SimpleSessionManager: ObservableObject {
     func addSession(_ session: SimpleSession) {
         sessions.append(session)
         print("✅ Session added! Total sessions: \(sessions.count)")
+        
+        // Notify tutor of new request
+        NotificationManager.shared.notifyTutorOfNewRequest(
+            tutorEmail: session.tutorEmail,
+            studentName: session.studentName,
+            subject: session.subject,
+            sessionId: session.id
+        )
     }
     
     // Get sessions for a specific tutor
@@ -53,6 +61,14 @@ class SimpleSessionManager: ObservableObject {
     func acceptSession(_ session: SimpleSession) {
         if let index = sessions.firstIndex(where: { $0.id == session.id }) {
             sessions[index].status = "accepted"
+            
+            // Notify student of acceptance
+            NotificationManager.shared.notifyStudentOfAcceptance(
+                studentEmail: session.studentEmail,
+                tutorName: session.tutorName,
+                subject: session.subject,
+                sessionId: session.id
+            )
         }
     }
     
@@ -60,6 +76,14 @@ class SimpleSessionManager: ObservableObject {
     func rejectSession(_ session: SimpleSession) {
         if let index = sessions.firstIndex(where: { $0.id == session.id }) {
             sessions[index].status = "rejected"
+            
+            // Notify student of rejection
+            NotificationManager.shared.notifyStudentOfRejection(
+                studentEmail: session.studentEmail,
+                tutorName: session.tutorName,
+                subject: session.subject,
+                sessionId: session.id
+            )
         }
     }
     

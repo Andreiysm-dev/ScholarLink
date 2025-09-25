@@ -3,6 +3,18 @@ import SwiftData
 
 // HEADER
 struct HeaderView: View {
+    @StateObject private var notificationManager = NotificationManager.shared
+    @State private var showingNotifications = false
+    
+    var currentUser: User? {
+        return UserSession.shared.currentUser
+    }
+    
+    var unreadCount: Int {
+        guard let user = currentUser else { return 0 }
+        return notificationManager.getUnreadCount(for: user.email)
+    }
+    
     var body: some View {
         HStack {
             HStack {
@@ -31,16 +43,39 @@ struct HeaderView: View {
                     .font(.title2)
                     .background(Color.black)
                     .cornerRadius(20)
-                Image(systemName: "bell.circle.fill")
-                    .foregroundColor(.white)
-                    .font(.title2)
-                    .background(Color.black)
-                    .cornerRadius(20)
+                
+                // Notification bell with badge
+                Button(action: {
+                    showingNotifications = true
+                }) {
+                    ZStack {
+                        Image(systemName: "bell.circle.fill")
+                            .foregroundColor(.white)
+                            .font(.title2)
+                            .background(Color.black)
+                            .cornerRadius(20)
+                        
+                        // Badge for unread notifications
+                        if unreadCount > 0 {
+                            Text("\(unreadCount)")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .frame(minWidth: 16, minHeight: 16)
+                                .background(Color.red)
+                                .clipShape(Circle())
+                                .offset(x: 8, y: -8)
+                        }
+                    }
+                }
             }
             .padding(.horizontal,10)
             
         }
         .background(Color.blue.shadow(radius: 100))
+        .sheet(isPresented: $showingNotifications) {
+            NotificationView()
+        }
     }
 }
 

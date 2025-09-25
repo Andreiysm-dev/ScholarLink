@@ -21,11 +21,10 @@ struct AdminPanelView: View {
                         .foregroundColor(.gray)
                     
                     // Stats
-                    HStack(spacing: 20) {
+                    HStack(spacing: 30) {
                         StatView(title: "Total Users", count: allUsers.count)
                         StatView(title: "Tutors", count: tutorCount)
                         StatView(title: "Students", count: studentCount)
-                        StatView(title: "Unknown Role", count: unknownRoleCount)
                     }
                     .padding()
                     .background(Color.blue.opacity(0.1))
@@ -66,10 +65,6 @@ struct AdminPanelView: View {
     
     var studentCount: Int {
         allUsers.filter { $0.userRoleRaw == "learner" }.count
-    }
-    
-    var unknownRoleCount: Int {
-        allUsers.filter { $0.userRoleRaw != "tutor" && $0.userRoleRaw != "learner" }.count
     }
     
     // MARK: - Functions

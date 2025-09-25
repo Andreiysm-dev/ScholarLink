@@ -39,6 +39,25 @@ struct TutorDashboardView: View {
                             Text("Welcome, \(tutor.firstName)!")
                                 .font(.headline)
                                 .foregroundColor(.gray)
+                            
+                            // Debug information
+                            VStack(spacing: 4) {
+                                Text("Debug Info:")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                Text("Tutor ID: \(tutor.id.hashValue.description)")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                Text("Total Session Requests in DB: \(allSessionRequests.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                Text("Requests for this tutor: \(tutorSessionRequests.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(8)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
                         }
                         
                         // Stats
@@ -80,6 +99,25 @@ struct TutorDashboardView: View {
                                 AcceptedSessionCard(session: session)
                             }
                         }
+                    }
+                    
+                    // Debug: Show all session requests
+                    if !allSessionRequests.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("All Session Requests (Debug):")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                            
+                            ForEach(allSessionRequests.prefix(3), id: \.dateCreated) { request in
+                                Text("Request - Tutor ID: \(request.tutorId), Student ID: \(request.studentId), Subject: \(request.subject)")
+                                    .font(.caption2)
+                                    .foregroundColor(.red)
+                            }
+                        }
+                        .padding()
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(8)
+                        .padding(.horizontal)
                     }
                     
                     // Empty State

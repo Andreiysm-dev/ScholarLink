@@ -2,7 +2,7 @@ import SwiftUI
 import Foundation
 
 // Simple session data structure
-struct SimpleSession: Identifiable {
+struct SimpleSession: Identifiable, Codable {
     let id = UUID()
     let studentName: String
     let studentEmail: String
@@ -25,17 +25,50 @@ struct SimpleSession: Identifiable {
     var isRejected: Bool { status == "rejected" }
 }
 
-// Simple session manager using ObservableObject
+// Simple session manager using ObservableObject with persistence
 class SimpleSessionManager: ObservableObject {
     @Published var sessions: [SimpleSession] = []
     
     static let shared = SimpleSessionManager()
     
-    private init() {}
+    private let userDefaults = UserDefaults.standard
+    private let sessionsKey = "SavedSessions"
+    
+    private init() {
+        loadSessions()
+    }
+    
+    // Save sessions to UserDefaults
+    private func saveSessions() {
+        do {
+            let data = try JSONEncoder().encode(sessions)
+            userDefaults.set(data, forKey: sessionsKey)
+            print("💾 Sessions saved to UserDefaults")
+        } catch {
+            print("❌ Failed to save sessions: \(error)")
+        }
+    }
+    
+    // Load sessions from UserDefaults
+    private func loadSessions() {
+        guard let data = userDefaults.data(forKey: sessionsKey) else {
+            print("📱 No saved sessions found")
+            return
+        }
+        
+        do {
+            sessions = try JSONDecoder().decode([SimpleSession].self, from: data)
+            print("📱 Loaded \(sessions.count) sessions from UserDefaults")
+        } catch {
+            print("❌ Failed to load sessions: \(error)")
+            sessions = []
+        }
+    }
     
     // Add a new session request
     func addSession(_ session: SimpleSession) {
         sessions.append(session)
+        saveSessions() // Save after adding
         print("✅ Session added! Total sessions: \(sessions.count)")
         
         // Notify tutor of new request
@@ -61,6 +94,7 @@ class SimpleSessionManager: ObservableObject {
     func acceptSession(_ session: SimpleSession) {
         if let index = sessions.firstIndex(where: { $0.id == session.id }) {
             sessions[index].status = "accepted"
+            saveSessions() // Save after updating
             
             // Notify student of acceptance
             NotificationManager.shared.notifyStudentOfAcceptance(
@@ -76,6 +110,7 @@ class SimpleSessionManager: ObservableObject {
     func rejectSession(_ session: SimpleSession) {
         if let index = sessions.firstIndex(where: { $0.id == session.id }) {
             sessions[index].status = "rejected"
+            saveSessions() // Save after updating
             
             // Notify student of rejection
             NotificationManager.shared.notifyStudentOfRejection(

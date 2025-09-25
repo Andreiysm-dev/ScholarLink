@@ -20,15 +20,11 @@ struct DashboardView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Header Section
-                headerSection
-                
-                // Tab Selection
-                tabSelection
-                
-                // Content Section
+        VStack(spacing: 0) {
+            // Tab Selection
+            tabSelection
+            
+            // Content Section
                 ScrollView {
                     VStack(spacing: 20) {
                         // Available Tutors (replacing course progress)
@@ -42,96 +38,11 @@ struct DashboardView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
                 }
-            }
-            .background(Color(UIColor.systemGroupedBackground))
-            .ignoresSafeArea(.all, edges: .top)
         }
-        .navigationBarHidden(true)
+        .background(Color(UIColor.systemGroupedBackground))
     }
     
-    // MARK: - Header Section
-    var headerSection: some View {
-        ZStack {
-            // Gradient Background
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.blue.opacity(0.9),
-                    Color.blue.opacity(0.7)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            
-            VStack(spacing: 20) {
-                // Top Bar
-                HStack {
-                    // ScholarLink Logo
-                    HStack(spacing: 8) {
-                        Text("Scholar")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        Text("Link")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        Image(systemName: "graduationcap.fill")
-                            .foregroundColor(.white)
-                            .font(.title2)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(20)
-                    
-                    Spacer()
-                    
-                    // Icons
-                    HStack(spacing: 15) {
-                        Button(action: {}) {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.white)
-                                .font(.title3)
-                                .frame(width: 35, height: 35)
-                                .background(Color.white.opacity(0.2))
-                                .clipShape(Circle())
-                        }
-                        
-                        Button(action: {}) {
-                            Image(systemName: "line.horizontal.3")
-                                .foregroundColor(.white)
-                                .font(.title3)
-                                .frame(width: 35, height: 35)
-                                .background(Color.white.opacity(0.2))
-                                .clipShape(Circle())
-                        }
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 50)
-                
-                // Welcome Message
-                VStack(spacing: 8) {
-                    Text("Hi \(currentUser?.username ?? "Student")")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text("Find tutors and track your learning")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.9))
-                    
-                    // Simple stats
-                    Text("\(tutors.count) tutors available")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-                .padding(.bottom, 30)
-            }
-        }
-        .frame(height: 250)
-        .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-    }
+    // MARK: - Header Section Removed (using header from index)
     
     // MARK: - Tab Selection
     var tabSelection: some View {

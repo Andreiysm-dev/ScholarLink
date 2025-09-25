@@ -5,6 +5,7 @@ struct TutorDashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var allUsers: [User]
     @Query private var allSessionRequests: [SessionRequest]
+    @State private var refreshTrigger = 0
     
     // Get current logged-in tutor
     var currentTutor: User? {
@@ -57,6 +58,24 @@ struct TutorDashboardView: View {
                             }
                             .padding(8)
                             .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
+                        }
+                        
+                        // Refresh Button
+                        Button(action: {
+                            refreshTrigger += 1
+                            // Force refresh the model context
+                            try? modelContext.save()
+                        }) {
+                            HStack {
+                                Image(systemName: "arrow.clockwise")
+                                Text("Refresh Sessions")
+                            }
+                            .font(.subheadline)
+                            .foregroundColor(.blue)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.blue.opacity(0.1))
                             .cornerRadius(8)
                         }
                         
@@ -141,6 +160,11 @@ struct TutorDashboardView: View {
                 }
             }
             .navigationBarHidden(true)
+            .onAppear {
+                // Refresh data when view appears
+                refreshTrigger += 1
+            }
+            .id(refreshTrigger) // Force view refresh when trigger changes
         }
     }
     

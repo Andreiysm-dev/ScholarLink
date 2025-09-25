@@ -260,9 +260,14 @@ struct BookSessionView: View {
         
         do {
             try modelContext.save()
-            bookingMessage = "Success! Session request sent. Check console for debug info."
+            bookingMessage = "Success! Session saved with ID: \(sessionRequest.studentId)"
             print("✅ Session saved successfully!")
-            showingConfirmation = true
+            print("✅ Session details: Student=\(sessionRequest.studentId), Tutor=\(sessionRequest.tutorId)")
+            
+            // Wait a moment before showing confirmation to ensure save completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showingConfirmation = true
+            }
         } catch {
             bookingMessage = "Failed to send request: \(error.localizedDescription)"
             print("❌ Booking error: \(error)")

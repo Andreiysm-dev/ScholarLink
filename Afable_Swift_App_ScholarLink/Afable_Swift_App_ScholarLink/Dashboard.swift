@@ -9,11 +9,7 @@ struct DashboardView: View {
         user.userRoleRaw == "tutor" && user.isProfileComplete
     }) private var tutors: [User]
     
-    // Simple sample data - just replace courses with tutors
-    let availableTutors = [
-        SimpleTutor(name: "Sarah Johnson", subject: "Mathematics", rating: 4.8, price: 45),
-        SimpleTutor(name: "Mike Chen", subject: "Programming", rating: 4.9, price: 60)
-    ]
+    // No more hardcoded data - we'll use real tutors from SwiftData
     
     var body: some View {
         NavigationView {
@@ -151,11 +147,34 @@ struct DashboardView: View {
     // MARK: - Tutor Cards Section (replacing course progress)
     var tutorCardsSection: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
-            ForEach(availableTutors.indices, id: \.self) { index in
-                NavigationLink(destination: SimpleTutorProfileView(tutor: availableTutors[index])) {
-                    SimpleTutorCard(tutor: availableTutors[index])
+            if tutors.isEmpty {
+                // Show empty state when no tutors are available
+                VStack(spacing: 12) {
+                    Image(systemName: "person.3")
+                        .font(.largeTitle)
+                        .foregroundColor(.gray.opacity(0.6))
+                    
+                    Text("No Tutors Available")
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                    
+                    Text("Register as a tutor to appear here")
+                        .font(.subheadline)
+                        .foregroundColor(.gray.opacity(0.8))
+                        .multilineTextAlignment(.center)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.white)
+                .cornerRadius(12)
+                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            } else {
+                ForEach(tutors, id: \.id) { tutor in
+                    NavigationLink(destination: RealTutorProfileView(tutor: tutor)) {
+                        RealTutorCard(tutor: tutor)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
             }
         }
     }
@@ -204,41 +223,43 @@ struct TabButton: View {
     }
 }
 
-// MARK: - Simple Tutor Card (replacing course progress card)
-struct SimpleTutorCard: View {
-    let tutor: SimpleTutor
+// MARK: - Real Tutor Card (using SwiftData User model)
+struct RealTutorCard: View {
+    let tutor: User
     
     var body: some View {
         VStack(spacing: 16) {
             // Profile picture placeholder (replacing circular progress)
             VStack(spacing: 8) {
                 Circle()
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(Color.blue.opacity(0.2))
                     .frame(width: 60, height: 60)
                     .overlay(
-                        Image(systemName: "person.fill")
-                            .font(.title2)
-                            .foregroundColor(.gray)
+                        Text("\(String(tutor.firstName.prefix(1)))\(String(tutor.lastName.prefix(1)))")
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                            .fontWeight(.semibold)
                     )
                 
-                Text("\(String(format: "%.1f", tutor.rating)) ⭐")
+                Text("4.8 ⭐") // Default rating for now
                     .font(.caption)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.orange)
             }
             
             // Tutor Info (replacing course info)
             VStack(spacing: 4) {
-                Text(tutor.name)
+                Text("\(tutor.firstName) \(tutor.lastName)")
                     .font(.headline)
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
+                    .lineLimit(1)
                 
-                Text(tutor.subject)
+                Text(tutor.selectedSubjects.first ?? "General")
                     .font(.caption)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                 
-                Text("$\(tutor.price)/hr")
+                Text("$\(Int(tutor.hourlyRate ?? 0))/hr")
                     .font(.caption)
                     .foregroundColor(.green)
                     .fontWeight(.medium)
@@ -285,40 +306,41 @@ struct SimpleActivityRow: View {
     }
 }
 
-// MARK: - Simple Tutor Profile View
-struct SimpleTutorProfileView: View {
-    let tutor: SimpleTutor
+// MARK: - Real Tutor Profile View (using SwiftData User model)
+struct RealTutorProfileView: View {
+    let tutor: User
     
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
                 // Profile Header
                 VStack(spacing: 16) {
-                    // Large profile picture placeholder
+                    // Large profile picture placeholder with initials
                     Circle()
-                        .fill(Color.gray.opacity(0.2))
+                        .fill(Color.blue.opacity(0.2))
                         .frame(width: 120, height: 120)
                         .overlay(
-                            Image(systemName: "person.fill")
+                            Text("\(String(tutor.firstName.prefix(1)))\(String(tutor.lastName.prefix(1)))")
                                 .font(.system(size: 50))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.blue)
+                                .fontWeight(.bold)
                         )
                     
                     VStack(spacing: 8) {
-                        Text(tutor.name)
+                        Text("\(tutor.firstName) \(tutor.lastName)")
                             .font(.title2)
                             .fontWeight(.bold)
                         
-                        Text(tutor.subject)
+                        Text(tutor.selectedSubjects.first ?? "General Tutor")
                             .font(.headline)
                             .foregroundColor(.blue)
                         
                         HStack(spacing: 16) {
-                            Text("\(String(format: "%.1f", tutor.rating)) ⭐")
+                            Text("4.8 ⭐") // Default rating for now
                                 .font(.subheadline)
                                 .foregroundColor(.orange)
                             
-                            Text("$\(tutor.price)/hour")
+                            Text("$\(Int(tutor.hourlyRate ?? 0))/hour")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.green)
@@ -333,12 +355,35 @@ struct SimpleTutorProfileView: View {
                         .font(.headline)
                         .fontWeight(.semibold)
                     
-                    Text("Experienced \(tutor.subject.lowercased()) tutor with a passion for helping students achieve their goals. I focus on making complex concepts easy to understand.")
+                    Text(tutor.bio.isEmpty ? "Experienced tutor with a passion for helping students achieve their goals. I focus on making complex concepts easy to understand." : tutor.bio)
                         .font(.body)
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
+                
+                // Subjects Section
+                if !tutor.selectedSubjects.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Expertise Areas")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 10) {
+                            ForEach(tutor.selectedSubjects, id: \.self) { subject in
+                                Text(subject)
+                                    .font(.caption)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color.blue.opacity(0.1))
+                                    .foregroundColor(.blue)
+                                    .cornerRadius(15)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                }
                 
                 // Experience Section
                 VStack(alignment: .leading, spacing: 12) {
@@ -347,9 +392,9 @@ struct SimpleTutorProfileView: View {
                         .fontWeight(.semibold)
                     
                     VStack(spacing: 8) {
-                        ExperienceRow(title: "Years Teaching", value: "5+ years")
-                        ExperienceRow(title: "Students Helped", value: "200+")
-                        ExperienceRow(title: "Success Rate", value: "95%")
+                        ExperienceRow(title: "Years Teaching", value: "\(tutor.yearsExperience ?? 0)+ years")
+                        ExperienceRow(title: "Hourly Rate", value: "$\(Int(tutor.hourlyRate ?? 0))")
+                        ExperienceRow(title: "Profile Complete", value: tutor.isProfileComplete ? "Yes" : "No")
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

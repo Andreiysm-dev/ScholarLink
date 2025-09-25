@@ -3,9 +3,8 @@ import Foundation
 
 @Model
 class SessionRequest {
-    var id: UUID
-    var studentId: UUID
-    var tutorId: UUID
+    var studentId: String // Store as string to match with User.id
+    var tutorId: String   // Store as string to match with User.id
     var subject: String
     var requestedDate: Date
     var duration: Int // in minutes
@@ -19,8 +18,7 @@ class SessionRequest {
     var isPending: Bool { status == "pending" }
     var isRejected: Bool { status == "rejected" }
     
-    init(studentId: UUID, tutorId: UUID, subject: String, requestedDate: Date, duration: Int, message: String, hourlyRate: Double) {
-        self.id = UUID()
+    init(studentId: String, tutorId: String, subject: String, requestedDate: Date, duration: Int, message: String, hourlyRate: Double) {
         self.studentId = studentId
         self.tutorId = tutorId
         self.subject = subject

@@ -170,7 +170,7 @@ struct DashboardView: View {
                 .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
             } else {
                 ForEach(tutors, id: \.id) { tutor in
-                    NavigationLink(destination: RealTutorProfileView(tutor: tutor)) {
+                    NavigationLink(destination: TutorDetailView(tutor: tutor)) {
                         RealTutorCard(tutor: tutor)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -223,55 +223,7 @@ struct TabButton: View {
     }
 }
 
-// MARK: - Real Tutor Card (using SwiftData User model)
-struct RealTutorCard: View {
-    let tutor: User
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            // Profile picture placeholder (replacing circular progress)
-            VStack(spacing: 8) {
-                Circle()
-                    .fill(Color.blue.opacity(0.2))
-                    .frame(width: 60, height: 60)
-                    .overlay(
-                        Text("\(String(tutor.firstName.prefix(1)))\(String(tutor.lastName.prefix(1)))")
-                            .font(.headline)
-                            .foregroundColor(.blue)
-                            .fontWeight(.semibold)
-                    )
-                
-                Text("4.8 ⭐") // Default rating for now
-                    .font(.caption)
-                    .foregroundColor(.orange)
-            }
-            
-            // Tutor Info (replacing course info)
-            VStack(spacing: 4) {
-                Text("\(tutor.firstName) \(tutor.lastName)")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(1)
-                
-                Text(tutor.selectedSubjects.first ?? "General")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.center)
-                
-                Text("$\(Int(tutor.hourlyRate ?? 0))/hr")
-                    .font(.caption)
-                    .foregroundColor(.green)
-                    .fontWeight(.medium)
-            }
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-    }
-}
+// Note: Using RealTutorCard from Home.swift - no need to redeclare
 
 // MARK: - Simple Activity Row (replacing completed task row)
 struct SimpleActivityRow: View {
@@ -306,143 +258,9 @@ struct SimpleActivityRow: View {
     }
 }
 
-// MARK: - Real Tutor Profile View (using SwiftData User model)
-struct RealTutorProfileView: View {
-    let tutor: User
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Profile Header
-                VStack(spacing: 16) {
-                    // Large profile picture placeholder with initials
-                    Circle()
-                        .fill(Color.blue.opacity(0.2))
-                        .frame(width: 120, height: 120)
-                        .overlay(
-                            Text("\(String(tutor.firstName.prefix(1)))\(String(tutor.lastName.prefix(1)))")
-                                .font(.system(size: 50))
-                                .foregroundColor(.blue)
-                                .fontWeight(.bold)
-                        )
-                    
-                    VStack(spacing: 8) {
-                        Text("\(tutor.firstName) \(tutor.lastName)")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        Text(tutor.selectedSubjects.first ?? "General Tutor")
-                            .font(.headline)
-                            .foregroundColor(.blue)
-                        
-                        HStack(spacing: 16) {
-                            Text("4.8 ⭐") // Default rating for now
-                                .font(.subheadline)
-                                .foregroundColor(.orange)
-                            
-                            Text("$\(Int(tutor.hourlyRate ?? 0))/hour")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.green)
-                        }
-                    }
-                }
-                .padding()
-                
-                // About Section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("About")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    
-                    Text(tutor.bio.isEmpty ? "Experienced tutor with a passion for helping students achieve their goals. I focus on making complex concepts easy to understand." : tutor.bio)
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                
-                // Subjects Section
-                if !tutor.selectedSubjects.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Expertise Areas")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                        
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 10) {
-                            ForEach(tutor.selectedSubjects, id: \.self) { subject in
-                                Text(subject)
-                                    .font(.caption)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color.blue.opacity(0.1))
-                                    .foregroundColor(.blue)
-                                    .cornerRadius(15)
-                            }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                }
-                
-                // Experience Section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Experience")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    
-                    VStack(spacing: 8) {
-                        ExperienceRow(title: "Years Teaching", value: "\(tutor.yearsExperience ?? 0)+ years")
-                        ExperienceRow(title: "Hourly Rate", value: "$\(Int(tutor.hourlyRate ?? 0))")
-                        ExperienceRow(title: "Profile Complete", value: tutor.isProfileComplete ? "Yes" : "No")
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                
-                // Book Session Button
-                Button(action: {
-                    // TODO: Add booking functionality
-                }) {
-                    Text("Book a Session")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(12)
-                }
-                .padding(.horizontal)
-                
-                Spacer()
-            }
-        }
-        .navigationTitle("Tutor Profile")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
+// Note: Using TutorDetailView from Home.swift for tutor profiles
 
-// MARK: - Experience Row Component
-struct ExperienceRow: View {
-    let title: String
-    let value: String
-    
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
-            Spacer()
-            
-            Text(value)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
-        }
-        .padding(.vertical, 4)
-    }
-}
+// Note: Removed duplicate components - using existing ones from Home.swift
 
 // MARK: - Data Models
 
